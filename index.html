@@ -488,14 +488,15 @@ let aiLoopRunning    = false;
 let aiCaptureStream  = null; // reference so we can stop it on leave
 
 function startAICapture(stream, containerDiv) {
-  if (!IS_LOCAL) {
-    console.log("📱 Remote device — AI capture disabled.");
-    return;
-  }
-
-  // Point the hidden video at the raw stream
   captureVideo.srcObject = stream;
   aiCaptureStream = stream;
+  captureVideo.setAttribute('playsinline', '');
+  captureVideo.setAttribute('webkit-playsinline', '');
+  captureVideo.muted = true;
+  
+  captureVideo.onloadedmetadata = () => {
+    captureVideo.play().catch(() => {});
+  };
   captureVideo.play().catch(() => {});
 
   const badge = document.createElement("div");
@@ -503,16 +504,6 @@ function startAICapture(stream, containerDiv) {
   badge.innerText = "🤟 AI ready";
   containerDiv.appendChild(badge);
 
-  // FIX: use a self-scheduling loop instead of setInterval.
-  //
-  // setInterval(100) fires every 100ms REGARDLESS of whether the
-  // previous request finished. When inference takes 400ms, you get
-  // 4 queued requests firing at once, then silence, then another burst —
-  // completely breaking the temporal frame sequence the model expects.
-  //
-  // This loop fires the next request only AFTER the previous one
-  // completes, giving the server a steady, gapless stream of frames
-  // at the actual speed it can process them.
   aiLoopRunning = true;
   runAILoop(badge);
 }
