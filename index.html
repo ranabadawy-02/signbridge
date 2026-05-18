@@ -518,13 +518,13 @@ async function runAILoop(badge) {
 
     // Draw the current video frame onto the capture canvas
     captureCtx.drawImage(captureVideo, 0, 0, CAPTURE_W, CAPTURE_H);
-
-    // FIX: use JPEG at quality 0.92 — NOT PNG.
-    // PNG is lossless but 5-10x larger than JPEG at this quality level.
-    // The extra size means slower HTTP round-trips, which creates bigger
-    // time gaps between frames. At quality 0.92, JPEG gives clean enough
-    // frames for MediaPipe without the size penalty.
     const frame = captureCanvas.toDataURL("image/jpeg", 0.92);
+
+    // DEBUG - remove after fixing
+    console.log("videoWidth:", captureVideo.videoWidth, 
+                "videoHeight:", captureVideo.videoHeight,
+                "readyState:", captureVideo.readyState,
+                "frameSize:", frame.length);
 
     try {
       const resp = await fetch(`/ai/process_frame`, {
