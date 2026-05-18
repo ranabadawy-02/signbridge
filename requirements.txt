@@ -3,5 +3,5 @@ flask-cors
 opencv-python-headless
 numpy
 torch
-mediapipe
+mediapipe==0.10.9
 edge-tts
