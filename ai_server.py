@@ -341,10 +341,10 @@ def load_model():
 CONFIDENCE_THRESHOLD = 0.25
 MOTION_THRESHOLD     = 0.003   # normalized to 30 FPS baseline
 # FIX ③: time-based rest instead of frame-count based
-REST_DURATION_MS     = 150     # 200ms of stillness ends a sign
-MIN_SIGN_DURATION    = 5      # minimum frames before accepting a sign
+REST_DURATION_MS     = 800     # 200ms of stillness ends a sign
+MIN_SIGN_DURATION    = 3     # minimum frames before accepting a sign
 # FIX ①: maximum gap between frames before resetting state
-MAX_FRAME_GAP_MS     = 200     # if >200ms since last frame, state is stale
+MAX_FRAME_GAP_MS     = 2000    # if >200ms since last frame, state is stale
 
 # ==============================================================================
 # MAIN INFERENCE ENDPOINT
