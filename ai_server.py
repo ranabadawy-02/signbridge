@@ -460,7 +460,7 @@ def process_frame():
                               len(state["motion_buffer"])
                               if state["motion_buffer"] else 0)
         state["is_moving"] = recent_motion > MOTION_THRESHOLD
-
+        print(f"🖐️ recent_motion={recent_motion:.6f} threshold={MOTION_THRESHOLD} is_moving={state['is_moving']}")
     if current_hand_positions:
         state["prev_hand_positions"] = current_hand_positions
 
