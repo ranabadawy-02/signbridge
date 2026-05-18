@@ -329,9 +329,9 @@ def load_model():
 
     holistic = mp_holistic.Holistic(
         static_image_mode=False,
-        model_complexity=1,
-        min_detection_confidence=0.5,
-        min_tracking_confidence=0.5
+        model_complexity=0,
+        min_detection_confidence=0.3,
+        min_tracking_confidence=0.3
     )
     print("✅ MediaPipe ready!")
 
