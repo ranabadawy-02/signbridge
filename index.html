@@ -535,6 +535,7 @@ async function runAILoop(badge) {
 
       if (resp.ok) {
         const result = await resp.json();
+        console.log("Server result:", JSON.stringify(result));
 
         // Update badge
         if (badge) {
