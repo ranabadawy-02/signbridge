@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SignBridge — Meeting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; font-family:'DM Sans', Arial, sans-serif; background:#0f0f0f; color:white; }
+
+    /* ─── HOME SCREEN ─── */
+    #home {
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      gap:14px;
+      background: radial-gradient(ellipse at center, #0d1a2e 0%, #060912 70%);
+    }
+
+    .home-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #63b3ed, #7ee8a2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+    }
+    .home-sub {
+      font-size: 13px;
+      color: #7a90b8;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: 'Syne', sans-serif;
+      margin-bottom: 20px;
+    }
+
+    #home input {
+      padding: 13px 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(99,179,237,0.2);
+      background: rgba(13,20,38,0.8);
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      width: 300px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    #home input:focus {
+      border-color: #63b3ed;
+      box-shadow: 0 0 0 3px rgba(99,179,237,0.1);
+    }
+    #home input::placeholder { color: rgba(122,144,184,0.5); }
+
+    .homeBtn {
+      padding: 13px 28px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2b6cb0, #2c7a4f);
+      color: white;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.05em;
+      transition: all 0.3s;
+      margin-top: 6px;
+      width: 300px;
+      position: relative;
+      overflow: hidden;
+    }
+    .homeBtn::before {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(135deg, #63b3ed, #7ee8a2);
+      opacity:0; transition: opacity 0.3s;
+    }
+    .homeBtn:hover::before { opacity:1; }
+    .homeBtn span { position:relative; z-index:1; }
+    .homeBtn:hover { transform:translateY(-1px); box-shadow:0 8px 25px rgba(99,179,237,0.25); }
+
+    /* ─── TOP BAR ─── */
+    #topBar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 20px;
+      background:#1f1f1f;
+      border-bottom:1px solid #333;
+    }
+
+    #topBar .brand-small {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #63b3ed, #7ee8a2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #participants { font-size:13px; opacity:0.7; }
+
+    #copyStatus {
+      margin-left:10px;
+      color:#2ecc71;
+      opacity:0;
+      transition:0.3s;
+    }
+
+    /* ─── CONTROLS ─── */
+    #controls {
+      position:fixed;
+      bottom:0;
+      width:100%;
+      background:#1f1f1f;
+      display:flex;
+      justify-content:center;
+      gap:15px;
+      padding:12px;
+      border-top: 1px solid #333;
+    }
+
+    button {
+      padding:10px 14px;
+      border-radius:8px;
+      border:none;
+      cursor:pointer;
+      font-size:14px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .active   { background:#2ecc71; color:black; }
+    .inactive { background:#e74c3c; color:white; }
+    .normal   { background:#333;    color:white; }
+    .ai-on    { background:#3498db; color:white; font-weight:bold; }
+    .ai-off   { background:#555;    color:#aaa; }
+
+    /* ─── VIDEO GRID ─── */
+    #videos {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
+      gap:10px;
+      padding:15px;
+      margin-bottom:80px;
+    }
+
+    .video-container {
+      border-radius:12px;
+      overflow:hidden;
+      background:black;
+      position:relative;
+    }
+
+    .username-label {
+      position:absolute;
+      bottom:5px;
+      left:8px;
+      background:rgba(0,0,0,0.6);
+      padding:3px 6px;
+      border-radius:5px;
+      font-size:12px;
+    }
+
+    .subtitle {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.72);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 15px;
+      color: #ffffff;
+      font-weight: 600;
+      white-space: nowrap;
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      direction: rtl;
+      transition: opacity 0.3s;
+      font-family: 'DM Sans', sans-serif;
+      pointer-events: none;
+    }
+
+    /* ─── TTS CONTROLS ─── */
+    #tts-controls {
+      position:fixed;
+      top: 60px;
+      right: 15px;
+      background:#1f1f1f;
+      border:1px solid #333;
+      border-radius:10px;
+      padding:12px 16px;
+      z-index:100;
+      font-size:13px;
+      min-width:200px;
+    }
+    #tts-controls h4 { margin:0 0 10px 0; color:#7ee8a2; font-size:13px; font-family:'Syne',sans-serif; }
+    #tts-controls label { display:block; margin:6px 0 2px; color:#aaa; font-size:11px; }
+    #tts-controls input[type=range] { width:100%; accent-color:#63b3ed; }
+    #tts-controls select { width:100%; padding:4px; border-radius:5px; border:none; background:#333; color:white; font-size:12px; }
+
+    /* ─── AI STATUS BADGE ─── */
+    #ai-status-badge {
+      position:absolute;
+      bottom:30px;
+      right:8px;
+      background:rgba(0,0,0,0.7);
+      padding:3px 8px;
+      border-radius:5px;
+      font-size:11px;
+      color:#aaa;
+    }
+    #ai-status-badge.signing  { color:#f1c40f; }
+    #ai-status-badge.complete { color:#2ecc71; }
+
+    video { width:100%; display:block; }
+  </style>
+</head>
+
+<body>
+
+<!-- HOME SCREEN -->
+<div id="home">
+  <div class="home-logo">SignBridge</div>
+  <div class="home-sub">Real-time sign language meetings</div>
+  <input id="usernameInput" placeholder="Your display name">
+  <input id="roomInput" placeholder="Room name">
+  <button class="homeBtn" onclick="joinRoom()"><span>Join Meeting →</span></button>
+</div>
+
+<!-- CALL UI -->
+<div id="callUI" style="display:none;">
+  <div id="topBar">
+    <div class="brand-small">SignBridge</div>
+    <div>
+      <span id="participants">0 participants</span>
+      <span id="copyStatus">✔ Link copied</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button id="aiBtn" class="ai-on" onclick="toggleAI()">🤟 Sign ON</button>
+      <button class="normal" onclick="copyLink()">Copy Link</button>
+    </div>
+  </div>
+
+  <!-- TTS VOICE CONTROLS -->
+  <div id="tts-controls">
+    <h4>🔊 Voice Controls</h4>
+    <label>Speed: <span id="rateVal">Normal</span></label>
+    <input type="range" id="ttsRate" min="-2" max="2" step="0.5" value="0"
+      oninput="document.getElementById('rateVal').innerText=this.value>0?'+'+this.value:this.value">
+
+    <label>Pitch: <span id="pitchVal">Normal</span></label>
+    <input type="range" id="ttsPitch" min="-2" max="2" step="0.5" value="0"
+      oninput="document.getElementById('pitchVal').innerText=this.value>0?'+'+this.value:this.value">
+
+    <label>Volume: <span id="volVal">1.0</span></label>
+    <input type="range" id="ttsVol" min="0" max="1" step="0.1" value="1.0"
+      oninput="document.getElementById('volVal').innerText=this.value">
+
+    <label>Voice:</label>
+    <select id="ttsVoice">
+      <option value="female">Salma (Female 🇪🇬)</option>
+      <option value="male">Shakir (Male 🇪🇬)</option>
+    </select>
+  </div>
+
+  <div id="videos"></div>
+
+  <div id="controls">
+    <button id="micBtn" class="active" onclick="toggleMic()">Mic</button>
+    <button id="camBtn" class="active" onclick="toggleCamera()">Camera</button>
+    <button class="normal" onclick="leaveCall()">Leave</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+
+<script>
+// ============================================================
+// AUTO-FILL FROM LOGIN SESSION
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  const params  = new URLSearchParams(window.location.search);
+  const urlUser = params.get('user');
+  if (urlUser) {
+    document.getElementById('usernameInput').value = urlUser;
+  } else {
+    try {
+      const session = JSON.parse(localStorage.getItem('signbridge_current') || 'null');
+      if (session && session.displayName)
+        document.getElementById('usernameInput').value = session.displayName;
+    } catch(e) {}
+  }
+
+  try {
+    const session = JSON.parse(localStorage.getItem('signbridge_current') || 'null');
+    if (session && session.username) {
+      const users    = JSON.parse(localStorage.getItem('signbridge_users') || '{}');
+      const userData = users[session.username];
+      if (userData && userData.voice) {
+        const voiceSelect = document.getElementById('ttsVoice');
+        if (voiceSelect) voiceSelect.value = userData.voice;
+      }
+    }
+  } catch(e) {}
+});
+
+// ============================================================
+// CONFIG
+// ============================================================
+// ✅ WITH THIS:
+const AI_SERVER = "/ai";   // empty = use relative URLs through Node proxy
+const IS_LOCAL  = true; // always true — AI server always runs alongside
+
+const socket = io();
+const peer   = new Peer();
+
+const videoGrid = document.getElementById("videos");
+
+let ROOM_ID   = null;
+let USERNAME  = null;
+let myStream;
+let myPeerId;
+let aiEnabled = true;
+
+// ============================================================
+// AUDIO UNLOCK (Safari)
+// ============================================================
+let audioCtx      = null;
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = audioCtx.createBuffer(1, 1, 22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    src.start(0);
+    audioUnlocked = true;
+  } catch(e) {}
+}
+
+document.addEventListener("click",      unlockAudio, { once: false });
+document.addEventListener("touchstart", unlockAudio, { once: false });
+
+const peers = {};
+const users = {};
+
+// ============================================================
+// GET CAMERA
+// ============================================================
+navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }
+}).then(stream => { myStream = stream; });
+
+peer.on("open", id => { myPeerId = id; });
+
+// ============================================================
+// JOIN
+// ============================================================
+function joinRoom() {
+  unlockAudio();
+  const room     = document.getElementById("roomInput").value.trim();
+  const username = document.getElementById("usernameInput").value.trim();
+  if (!room || !username) return;
+
+  ROOM_ID  = room;
+  USERNAME = username;
+  users[myPeerId] = USERNAME;
+
+  document.getElementById("home").style.display   = "none";
+  document.getElementById("callUI").style.display = "block";
+
+  addVideo(myStream, "me", USERNAME, true);
+  socket.emit("join-room", { roomId: ROOM_ID, peerId: myPeerId, username: USERNAME });
+}
+
+// ============================================================
+// PEER CALLS
+// ============================================================
+peer.on("call", call => {
+  call.answer(myStream);
+  call.on("stream", stream => {
+    const name = users[call.peer] || "User";
+    addVideo(stream, call.peer, name);
+  });
+  call.on("close", () => removeVideo(call.peer));
+  peers[call.peer] = call;
+});
+
+socket.on("user-connected", data => {
+  users[data.peerId] = data.username;
+  if (data.peerId === myPeerId) return;
+  const call = peer.call(data.peerId, myStream);
+  call.on("stream", stream => addVideo(stream, data.peerId, data.username));
+  call.on("close",  () => removeVideo(data.peerId));
+  peers[data.peerId] = call;
+});
+
+socket.on("user-disconnected", id => {
+  if (peers[id]) { peers[id].close(); delete peers[id]; }
+  removeVideo(id);
+  if (IS_LOCAL) {
+    fetch(`/ai/reset_peer`, {
+      method: "POST", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ peerId: id })
+    }).catch(() => {});
+  }
+});
+
+socket.on("participants-count", count => {
+  document.getElementById("participants").innerText = count + " participants";
+});
+
+socket.on("receive-message", data => {
+  const { peerId, text, audio } = data;
+  const container = document.getElementById(peerId);
+  if (!container) return;
+  showSubtitle(container, text);
+  if (audio) playAudio(audio);
+});
+
+// ============================================================
+// ADD VIDEO TILE
+// ============================================================
+function addVideo(stream, id, username, mute = false) {
+  if (document.getElementById(id)) return;
+
+  const div = document.createElement("div");
+  div.className = "video-container";
+  div.id = id;
+
+  const video = document.createElement("video");
+  video.srcObject   = stream;
+  video.autoplay    = true;
+  video.playsInline = true;
+  video.muted       = !!mute;
+  setTimeout(() => video.play().catch(() => {}), 300);
+
+  const name = document.createElement("div");
+  name.className = "username-label";
+  name.innerText = username;
+
+  div.appendChild(video);
+  div.appendChild(name);
+  videoGrid.appendChild(div);
+
+  // Only start AI capture for the local user
+  if (id === "me") startAICapture(stream, div);
+  //                              ^^^^^^
+  // FIX: pass the raw MediaStream, NOT the <video> element.
+  // Capturing from the video element goes through the browser
+  // rendering pipeline (color correction, mirroring, compositing).
+  // Capturing directly from the MediaStreamTrack gives clean,
+  // unprocessed frames — the same as what OpenCV reads from the camera.
+}
+
+// ============================================================
+// AI FRAME CAPTURE
+// ============================================================
+
+// FIX: use a fixed capture size that matches what the model was trained on.
+// 640×480 is fine — do NOT go larger (bigger PNG = slower round-trip).
+const CAPTURE_W = 640;
+const CAPTURE_H = 480;
+
+// We keep one canvas for drawing frames
+const captureCanvas = document.createElement("canvas");
+captureCanvas.width  = CAPTURE_W;
+captureCanvas.height = CAPTURE_H;
+const captureCtx = captureCanvas.getContext("2d");
+
+// A hidden video element that plays the raw stream for frame capture.
+// It is NOT added to the DOM — we only use it to draw onto the canvas.
+const captureVideo = document.createElement("video");
+captureVideo.autoplay    = true;
+captureVideo.playsInline = true;
+captureVideo.muted       = true;
+
+let aiLoopRunning    = false;
+let aiCaptureStream  = null; // reference so we can stop it on leave
+
+function startAICapture(stream, containerDiv) {
+  if (!IS_LOCAL) {
+    console.log("📱 Remote device — AI capture disabled.");
+    return;
+  }
+
+  // Point the hidden video at the raw stream
+  captureVideo.srcObject = stream;
+  aiCaptureStream = stream;
+  captureVideo.play().catch(() => {});
+
+  const badge = document.createElement("div");
+  badge.id        = "ai-status-badge";
+  badge.innerText = "🤟 AI ready";
+  containerDiv.appendChild(badge);
+
+  // FIX: use a self-scheduling loop instead of setInterval.
+  //
+  // setInterval(100) fires every 100ms REGARDLESS of whether the
+  // previous request finished. When inference takes 400ms, you get
+  // 4 queued requests firing at once, then silence, then another burst —
+  // completely breaking the temporal frame sequence the model expects.
+  //
+  // This loop fires the next request only AFTER the previous one
+  // completes, giving the server a steady, gapless stream of frames
+  // at the actual speed it can process them.
+  aiLoopRunning = true;
+  runAILoop(badge);
+}
+
+async function runAILoop(badge) {
+  while (aiLoopRunning) {
+    if (!aiEnabled || !captureVideo.videoWidth) {
+      // Not ready yet — wait a bit and retry
+      await sleep(50);
+      continue;
+    }
+
+    // Draw the current video frame onto the capture canvas
+    captureCtx.drawImage(captureVideo, 0, 0, CAPTURE_W, CAPTURE_H);
+
+    // FIX: use JPEG at quality 0.92 — NOT PNG.
+    // PNG is lossless but 5-10x larger than JPEG at this quality level.
+    // The extra size means slower HTTP round-trips, which creates bigger
+    // time gaps between frames. At quality 0.92, JPEG gives clean enough
+    // frames for MediaPipe without the size penalty.
+    const frame = captureCanvas.toDataURL("image/jpeg", 0.92);
+
+    try {
+      const resp = await fetch(`/ai/process_frame`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ peerId: myPeerId, frame, ...getTTSSettings() })
+      });
+
+      if (resp.ok) {
+        const result = await resp.json();
+
+        // Update badge
+        if (badge) {
+          if (result.is_signing) {
+            badge.className = "signing";
+            badge.innerText = `✍️ Signing… ${result.confidence}%`;
+          } else if (result.status === "complete") {
+            badge.className = "complete";
+            badge.innerText = `✅ Done`;
+          } else {
+            badge.className = "";
+            badge.innerText = `🤟 AI ready`;
+          }
+        }
+
+        // Show subtitle + play audio if a sign was recognised
+        if (result.text) {
+          const myContainer = document.getElementById("me");
+          if (myContainer) showSubtitle(myContainer, result.text);
+          if (result.audio) playAudio(result.audio);
+          socket.emit("send-message", {
+            peerId: myPeerId,
+            text:   result.text,
+            audio:  result.audio
+          });
+        }
+      }
+    } catch(e) {
+      // AI server unreachable — wait before retrying so we don't spam
+      await sleep(500);
+    }
+
+    // No sleep here on success — immediately send the next frame.
+    // The round-trip time of the fetch IS the pacing.
+    // This gives the server a continuous, gapless stream at whatever
+    // speed it can actually handle (typically ~5-15 FPS over localhost HTTP).
+  }
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ============================================================
+// SUBTITLE DISPLAY
+// ============================================================
+function showSubtitle(container, text) {
+  let sub = container.querySelector(".subtitle");
+  if (!sub) {
+    sub = document.createElement("div");
+    sub.className = "subtitle";
+    container.appendChild(sub);
+  }
+  sub.innerText     = text;
+  sub.style.opacity = "1";
+  clearTimeout(sub._fadeTimer);
+  sub._fadeTimer = setTimeout(() => { sub.style.opacity = "0"; }, 4000);
+}
+
+// ============================================================
+// AUDIO PLAYBACK
+// ============================================================
+function playAudio(base64mp3) {
+  if (!base64mp3) return;
+  const vol = parseFloat(document.getElementById("ttsVol")?.value || 1.0);
+
+  if (audioCtx) {
+    try {
+      const binary = atob(base64mp3);
+      const bytes  = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      audioCtx.decodeAudioData(bytes.buffer, buffer => {
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = vol;
+        gainNode.connect(audioCtx.destination);
+        const src = audioCtx.createBufferSource();
+        src.buffer = buffer;
+        src.connect(gainNode);
+        src.start(0);
+      });
+      return;
+    } catch(e) {}
+  }
+
+  try {
+    const audio = new Audio("data:audio/mp3;base64," + base64mp3);
+    audio.volume = vol;
+    audio.play().catch(() => {});
+  } catch(e) {}
+}
+
+// ============================================================
+// TTS SETTINGS
+// ============================================================
+function getTTSSettings() {
+  const rateVal  = parseFloat(document.getElementById("ttsRate")?.value  || 0);
+  const pitchVal = parseFloat(document.getElementById("ttsPitch")?.value || 0);
+  const voice    = document.getElementById("ttsVoice")?.value || "female";
+  const rateSign  = rateVal  >= 0 ? "+" : "";
+  const pitchSign = pitchVal >= 0 ? "+" : "";
+  return {
+    voice,
+    rate:   rateSign  + (rateVal  * 50).toFixed(0) + "%",
+    pitch:  pitchSign + (pitchVal * 50).toFixed(0) + "Hz",
+    volume: "+0%"
+  };
+}
+
+// ============================================================
+// AI TOGGLE
+// ============================================================
+function toggleAI() {
+  aiEnabled = !aiEnabled;
+  const btn = document.getElementById("aiBtn");
+  btn.className = aiEnabled ? "ai-on" : "ai-off";
+  btn.innerText = aiEnabled ? "🤟 Sign ON" : "🤟 Sign OFF";
+  if (!aiEnabled) {
+    const b = document.getElementById("ai-status-badge");
+    if (b) { b.className = ""; b.innerText = "🤟 AI paused"; }
+  }
+}
+
+// ============================================================
+// CONTROLS
+// ============================================================
+function removeVideo(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function toggleMic() {
+  const track = myStream.getAudioTracks()[0];
+  track.enabled = !track.enabled;
+  document.getElementById("micBtn").className = track.enabled ? "active" : "inactive";
+}
+
+function toggleCamera() {
+  const track = myStream.getVideoTracks()[0];
+  track.enabled = !track.enabled;
+  document.getElementById("camBtn").className = track.enabled ? "active" : "inactive";
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href);
+  const el = document.getElementById("copyStatus");
+  el.style.opacity = 1;
+  setTimeout(() => el.style.opacity = 0, 1500);
+}
+
+function leaveCall() {
+  // Stop the AI loop
+  aiLoopRunning = false;
+
+  if (IS_LOCAL) {
+    fetch(`/ai/reset_peer`, {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ peerId: myPeerId })
+    }).catch(() => {});
+  }
+
+  socket.emit("leave-room");
+  setTimeout(() => {
+    myStream.getTracks().forEach(t => t.stop());
+    if (captureVideo.srcObject) {
+      captureVideo.srcObject.getTracks().forEach(t => t.stop());
+      captureVideo.srcObject = null;
+    }
+    Object.values(peers).forEach(c => c.close());
+    socket.disconnect();
+    peer.destroy();
+    window.location.href = "/";
+  }, 200);
+}
+</script>
+</body>
+</html>

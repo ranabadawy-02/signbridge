@@ -1,0 +1,6 @@
+node_modules/
+sign_env/
+__pycache__/
+*.pyc
+.env
+.git
