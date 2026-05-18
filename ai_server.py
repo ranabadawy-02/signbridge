@@ -261,7 +261,7 @@ def get_peer_state(peer_id):
             # FIX ④: reduced from 120 → 60 so buffer doesn't hold too much
             # history at slow browser FPS (~10–15 FPS over HTTP)
             "frames_buffer":         deque(maxlen=60),
-            "hand_detection_buffer": deque(maxlen=30),
+            "hand_detection_buffer": deque(maxlen=5),
             "prediction_history":    deque(maxlen=5),
             "motion_buffer":         deque(maxlen=15),
             "prev_hand_positions":   None,
@@ -419,7 +419,7 @@ def process_frame():
 
     state["hand_detection_buffer"].append(hands_visible)
 
-    hands_stable   = sum(state["hand_detection_buffer"]) >= 10
+    hands_stable   = sum(state["hand_detection_buffer"]) >= 2
     detection_rate = (sum(state["hand_detection_buffer"]) /
                       len(state["hand_detection_buffer"])
                       if state["hand_detection_buffer"] else 0)
@@ -536,11 +536,9 @@ def process_frame():
     # ------------------------------------------------------------------
     # Model inference — every 2nd frame, min 10 frames
     # ------------------------------------------------------------------
-    if (frame_count % 2 == 0
-            and len(state["frames_buffer"]) >= 10
-            and hands_stable
-            and state["is_currently_signing"]
-            and good_detection):
+    if (len(state["frames_buffer"]) >= 3
+        and state["is_currently_signing"]
+        and good_detection):
         try:
             features        = np.stack(list(state["frames_buffer"]), axis=0)
             features_tensor = torch.FloatTensor(features).unsqueeze(0)
